@@ -45,6 +45,26 @@ export class Properties extends Entity {
   propertyDescription?: string;
 
   @property({
+    type: 'string',
+  })
+  propertyPrice?: string;
+
+  @property({
+    type: 'string',
+  })
+  propertyNoOfBadroom?: string;
+
+  @property({
+    type: 'string',
+  })
+  propertyNoOfBathroom?: string;
+
+  @property({
+    type: 'string',
+  })
+  propertyNoOfGarage?: string;
+
+  @property({
     type: 'array',
     itemType: 'string',
   })
@@ -52,10 +72,9 @@ export class Properties extends Entity {
 
   @property({
     type: 'date',
-    required: true,
     defaultFn:'now'
   })
-  createdAt: string;
+  createdAt?: string;
 
   @property({
     type: 'date',

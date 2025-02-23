@@ -5,3 +5,4 @@ export * from './properties.controller';
 export * from './rental-price.controller';
 export * from './payment-tracker.controller';
 export * from './user.controller';
+export * from './file-upload.controller';
