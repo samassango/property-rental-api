@@ -72,6 +72,33 @@ export class FileDownloadController {
     return response;
   }
 
+  
+  @get('/upload/property_listing/{filename}')
+  @oas.response.file()
+  viewFile(
+    @param.path.string('filename') fileName: string,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ) {
+    const file = this.validateFileName(fileName);
+    // console.log({file})
+    // response.download(file, fileName);
+    const filePath = path.join(__dirname, `.sandbox/${fileName}`);
+// console.log({filePath})
+    fs.readFile(file, (err, data) => {
+        if (err) {
+            response.status(500).send('Error reading file');
+          return;
+        }
+  
+        response.setHeader('Content-Type', 'application/octet-stream'); // Set the appropriate MIME type
+        response.setHeader('Content-Disposition', `inline; filename=${fileName}`); // 'inline' to view in browser
+        response.send(data);
+      });
+    
+    return response;
+  }
+
+
   /**
    * Validate file names to prevent them goes beyond the designated directory
    * @param fileName - File name

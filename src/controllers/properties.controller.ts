@@ -111,6 +111,22 @@ export class PropertiesController {
     return this.propertiesRepository.findById(id, filter);
   }
 
+  @get('/properties/property-owner/{userId}')
+  @response(200, {
+    description: 'Properties model instance by propertyOwnerId',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Properties, {includeRelations: true}),
+      },
+    },
+  })
+  async findByUserId(
+    @param.path.string('userId') userId: string,
+    @param.filter(Properties, {exclude: 'where'}) filter?: FilterExcludingWhere<Properties>
+  ): Promise<Properties[]> {
+    return this.propertiesRepository.find({where:{propertyOwnerId: userId}});
+  }
+
   @patch('/properties/{id}')
   @response(204, {
     description: 'Properties PATCH success',

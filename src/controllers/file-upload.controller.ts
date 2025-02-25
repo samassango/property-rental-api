@@ -54,6 +54,35 @@ export class FileUploadController {
     });
   }
 
+  @post('/upload/property_listing', {
+    responses: {
+      200: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+            },
+          },
+        },
+        description: 'Files and fields',
+      },
+    },
+  })
+  async propertyUpload(
+    @requestBody.file()
+    request: Request,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
+  ): Promise<object> {
+    return new Promise<object>((resolve, reject) => {
+      this.handler(request, response, (err: unknown) => {
+        if (err) reject(err);
+        else {
+          resolve(FileUploadController.getFilesAndFields(request));
+        }
+      });
+    });
+  }
+
   /**
    * Get files and fields for the request
    * @param request - Http request
@@ -78,7 +107,7 @@ export class FileUploadController {
     let arrURL =[]
     for(let index in files){
         const obj =files[Number(index)] as any
-        let url:string = `${request.headers.origin}${request.path}/${obj.originalname}`
+        let url:string = `http://127.0.0.1:3001${request.path}/${obj.originalname}`
         arrURL.push(url)
     }
 

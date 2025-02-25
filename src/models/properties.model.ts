@@ -35,9 +35,9 @@ export class Properties extends Entity {
 
   @property({
     type: 'boolean',
-    required: true,
+    defaultFn: true
   })
-  propertyAvailability: boolean;
+  propertyAvailability?: boolean;
 
   @property({
     type: 'string',

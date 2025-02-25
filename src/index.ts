@@ -1,4 +1,5 @@
-import {ApplicationConfig, PropertyRentalApiApplication} from './application';
+import { RequestBodyParser } from '@loopback/rest';
+import { ApplicationConfig, PropertyRentalApiApplication } from './application';
 
 export * from './application';
 
@@ -30,6 +31,7 @@ if (require.main === module) {
         // useful when used with OpenAPI-to-GraphQL to locate your application
         setServersFromRequest: true,
       },
+      requestBodyParser: { json: { limit: '10MB' } }
     },
   };
   main(config).catch(err => {
