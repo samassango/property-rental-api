@@ -19,7 +19,8 @@ import {
 } from '@loopback/rest';
 import {Properties} from '../models';
 import {PropertiesRepository} from '../repositories';
-
+import { authenticate } from '@loopback/authentication';
+@authenticate('jwt')
 export class PropertiesController {
   constructor(
     @repository(PropertiesRepository)
@@ -57,7 +58,8 @@ export class PropertiesController {
   ): Promise<Count> {
     return this.propertiesRepository.count(where);
   }
-
+  
+  @authenticate.skip()
   @get('/properties')
   @response(200, {
     description: 'Array of Properties model instances',

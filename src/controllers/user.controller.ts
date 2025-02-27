@@ -179,6 +179,7 @@ export class UserController {
 
     return savedUser;
   }
+  @authenticate('jwt')
   @post('/users/password-reset', {
     responses: {
       '200': {
