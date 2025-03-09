@@ -144,6 +144,26 @@ export class UserController {
     return user as User
   }
 
+  @authenticate('jwt')
+  @get('/get-current-user/{id}', {
+    responses: {
+      '200': {
+        description: 'Return current user',
+        content: {
+          'application/json': {
+            schema: getModelSchemaRef(User, {includeRelations: true}), 
+          },
+        },
+      },
+    },
+  })
+  async getuserById(
+    @param.path.string('id') id: string,
+  ): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: id } })
+    return user as User
+  }
+
   @post('/signup', {
     responses: {
       '200': {

@@ -113,7 +113,7 @@ export class PropertiesController {
     return this.propertiesRepository.findById(id, filter);
   }
 
-  @get('/properties/property-owner/{userId}')
+  @get('/properties/property-owner/{userId}/{tenantId}')
   @response(200, {
     description: 'Properties model instance by propertyOwnerId',
     content: {
@@ -124,10 +124,28 @@ export class PropertiesController {
   })
   async findByUserId(
     @param.path.string('userId') userId: string,
+    @param.path.string('tenantId') tenantId: string,
     @param.filter(Properties, {exclude: 'where'}) filter?: FilterExcludingWhere<Properties>
   ): Promise<Properties[]> {
-    return this.propertiesRepository.find({where:{propertyOwnerId: userId}});
+    return this.propertiesRepository.find({where:{propertyOwnerId: userId, propertyTenantId: tenantId}});
   }
+
+  @get('/properties/property-tenant/{tenantId}')
+  @response(200, {
+    description: 'Properties model instance by propertyTenantId',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Properties, {includeRelations: true}),
+      },
+    },
+  })
+  async findByTenantId(
+    @param.path.string('tenantId') tenantId: string,
+    @param.filter(Properties, {exclude: 'where'}) filter?: FilterExcludingWhere<Properties>
+  ): Promise<Properties[]> {
+    return this.propertiesRepository.find({where:{propertyTenantId: tenantId}});
+  }
+
 
   @patch('/properties/{id}')
   @response(204, {

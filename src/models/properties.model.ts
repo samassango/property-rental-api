@@ -25,6 +25,12 @@ export class Properties extends Entity {
     type: 'string',
     required: true,
   })
+  propertyTenantId: string;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
   propertyOwnerId: string;
 
   @property({
