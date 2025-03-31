@@ -10,7 +10,7 @@ import {
 } from '@loopback/authentication-jwt';
 import { inject } from '@loopback/core';
 import { Count, CountSchema, model, property, repository, Where } from '@loopback/repository';
-import { get, getModelSchemaRef, param, patch, post, requestBody, response, SchemaObject } from '@loopback/rest';
+import { get, getModelSchemaRef, HttpErrors, param, patch, post, requestBody, response, SchemaObject } from '@loopback/rest';
 import { SecurityBindings, securityId, UserProfile } from '@loopback/security';
 import { genSalt, hash } from 'bcryptjs';
 import _ from 'lodash';
@@ -27,6 +27,16 @@ export class NewUserRequest extends User {
     type: 'string',
   })
   lastname: string;
+  @property({
+    type: 'string',
+    required: true,
+  })
+  userType: string;
+  @property({
+    type: 'string',
+    required: true,
+  })
+  role: string;
 
   @property({
     type: 'string',
@@ -99,6 +109,31 @@ export class UserController {
     return { token };
   }
 
+  @post('/verifyToken')
+  async verifyToken(
+    @requestBody({
+      description: 'The input of verify token function',
+      required: true,
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              token: { type: 'string' },
+            },
+          },
+        },
+      },
+    })
+    requestData: { token: string },
+  ): Promise<UserProfile> {
+    try {
+      return await this.jwtService.verifyToken(requestData.token);
+    } catch (err) {
+      throw new HttpErrors.Unauthorized('Invalid token');
+    }
+  }
+
   @authenticate('jwt')
   @get('/whoAmI', {
     responses: {
@@ -151,7 +186,7 @@ export class UserController {
         description: 'Return current user',
         content: {
           'application/json': {
-            schema: getModelSchemaRef(User, {includeRelations: true}), 
+            schema: getModelSchemaRef(User, { includeRelations: true }),
           },
         },
       },
