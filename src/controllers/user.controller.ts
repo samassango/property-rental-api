@@ -16,7 +16,20 @@ import { genSalt, hash } from 'bcryptjs';
 import _ from 'lodash';
 // ----------------------------------
 
-@model()
+@model({
+  settings: {
+    indexes: {
+      uniqueEmail: {
+        keys: {
+          email: 1,
+        },
+        options: {
+          unique: true,
+        },
+      },
+    },
+  },
+})
 export class NewUserRequest extends User {
   @property({
     type: 'string',
@@ -57,6 +70,7 @@ const CredentialsSchema: SchemaObject = {
       type: 'string',
       minLength: 5,
     },
+
   },
 };
 
@@ -225,15 +239,29 @@ export class UserController {
     })
     newUserRequest: NewUserRequest,
   ): Promise<User> {
-    const password = await hash(newUserRequest.password, await genSalt());
-    const savedUser = await this.userRepository.create(
-      _.omit(newUserRequest, 'password'),
-    );
+    try {
+      const foundUser = await this.userRepository.findOne({ where: { email: newUserRequest.email } })
+      console.log({foundUser})
+      if (!foundUser) {
+        const password = await hash(newUserRequest.password, await genSalt());
+        const savedUser = await this.userRepository.create(
+          _.omit(newUserRequest, 'password'),
+        );
 
-    await this.userRepository.userCredentials(savedUser.id).create({ password });
+        await this.userRepository.userCredentials(savedUser.id).create({ password });
+        
+        return savedUser;
+      }else{
+         throw new HttpErrors.Forbidden('Account already exist, please login or request reset password')
+      }
 
-    return savedUser;
+    } catch (error) {
+      console.log({ error })
+      throw error
+    }
+
   }
+
   @authenticate('jwt')
   @post('/users/password-reset', {
     responses: {
@@ -268,7 +296,7 @@ export class UserController {
 
     const user = await this.userRepository.findOne({ where: { email: newUserRequest.email } })
     if (!user) {
-      throw new Error("User not found")
+      throw new HttpErrors.NotFound("User not found")
     }
     // const userProfile = this.userService.convertToUserProfile(user);
     // const token = await  this.jwtService.generateToken(userProfile);
